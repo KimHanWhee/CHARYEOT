@@ -6,9 +6,9 @@ spring:
 
 external:
   riot:
-    api-key: RGAPI-ade46a0e-3d6b-4d3e-b813-e97e877711f0
+    api-key: 
 
 gemini:
   api:
-    key: "AIzaSyBQJbSZDdVlPiQBPUsQQLwq6Er8eODaWH4"
+    key: ""
     url: "https://generativelanguage.googleapis.com"
