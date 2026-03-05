@@ -1,0 +1,14 @@
+server:
+  port: 7890
+
+spring:
+  application-name: charyeot
+
+external:
+  riot:
+    api-key: RGAPI-ade46a0e-3d6b-4d3e-b813-e97e877711f0
+
+gemini:
+  api:
+    key: "AIzaSyBQJbSZDdVlPiQBPUsQQLwq6Er8eODaWH4"
+    url: "https://generativelanguage.googleapis.com"

@@ -1,0 +1,5 @@
+{
+  "name": "Troll Finder",
+  "description": "A fun game history analyzer to find out who caused the defeat.",
+  "requestFramePermissions": []
+}
