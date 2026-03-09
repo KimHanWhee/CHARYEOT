@@ -24,6 +24,7 @@ export default function App() {
 
             {/* Game-specific search routes */}
             <Route path="/:game/search/:summonerName/:summonerTag" element={<SearchResultsPage />} />
+            <Route path="/:game/search/:summonerName" element={<SearchResultsPage />} />
 
             {/* Legacy redirect for old URLs */}
             <Route path="/search/:summonerName" element={<LegacySearchRedirect />} />

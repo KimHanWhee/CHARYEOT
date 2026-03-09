@@ -21,6 +21,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [currentGameFromUrl]);
 
+  useEffect(() => {
+    console.log('[GameContext] selectedGame:', selectedGame);
+  }, [selectedGame]);
+
   return (
     <GameContext.Provider value={{ selectedGame, setSelectedGame }}>
       {children}

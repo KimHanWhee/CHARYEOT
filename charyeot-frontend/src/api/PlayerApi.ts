@@ -1,5 +1,6 @@
-import type { ApiResponse, DataDragon, Match, PlayerSearchResult, Profile } from '../types/api';
-import { apiClient } from './client';
+import { ApiResponse } from '../types/api';
+import type { DataDragon, LolCharyeotResponse, Match, PlayerSearchResult, Profile } from '../types/lol';
+import { apiClient } from './Client';
 
 /**
  * 플레이어 프로필 조회
@@ -35,6 +36,18 @@ export async function fetchPlayerSummary(
     `/players/${encodeURIComponent(name)}/${encodeURIComponent(tag)}/summary`,
   );
   return res.data.data;
+}
+
+
+/**
+ * 특정 경기에 대한 Gemini 판결 요청
+ * POST /v1/charyeot/lol/{matchId}
+ */
+export async function fetchLolCharyeot(matchId: string): Promise<LolCharyeotResponse> {
+  const res = await apiClient.post<LolCharyeotResponse>(`/v1/charyeot/lol/${encodeURIComponent(matchId)}`, null, {
+    timeout: 60_000, // Gemini 응답 대기 최대 60초
+  });
+  return res.data;
 }
 
 /**
