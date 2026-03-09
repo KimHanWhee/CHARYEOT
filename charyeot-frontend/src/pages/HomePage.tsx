@@ -15,9 +15,20 @@ export function HomePage() {
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    const game = GAME_TABS.find(g => g.id === selectedGame);
-    const userTag = tag.trim() || "KR1";
-    navigate(`/${game?.path || GAME_PATHS.LOL}/search/${encodeURIComponent(name)}/${encodeURIComponent(userTag)}`);
+    // 1. 현재 선택된 게임 탭 정보 가져오기
+    const currentGame = GAME_TABS.find(g => g.id === selectedGame);
+    // 2. 게임별 경로(Path) 확정 (없을 경우 기본값 설정 가능하지만, 데이터가 있다면 currentGame.path가 정답)
+    const currentPath = currentGame?.path || GAME_PATHS.LOL;
+    // 3. 기본 경로 구성: /gamePath/search/userName
+    let finalPath = `/${currentPath}/search/${encodeURIComponent(name.trim())}`;
+    // 4. 태그가 필요한 게임(LoL, Valorant 등)일 경우 태그 추가
+    if (needsTag) {
+      const userTag = tag.trim() || 'KR1';
+      finalPath += `/${encodeURIComponent(userTag)}`;
+    }
+
+    // 5. 최종 이동
+    navigate(finalPath);
   };
 
   const isDisabled = !name.trim();
@@ -85,6 +96,13 @@ export function HomePage() {
           </button>
         </div>
       </form>
+      <div className="text-left text-slate-400 dark:text-slate-500 text-sm mt-3 space-y-1">
+        <p className="text-center text-md font-bold text-slate-600 dark:text-slate-300 mb-2">
+          ※ 참고해주세요.
+        </p>
+        <p>* 본 사이트는 제한된 데이터로 AI 판단하며 서로에 대한 비판보다는 단순 재미로만 이용해주시기 바랍니다.</p>
+        <p>* 본 사이트는 라이엇 게임즈, 님블 뉴런 등 공식 게임사와는 연관이 없는 사이트 입니다.</p>
+      </div>
     </motion.div>
   );
 }

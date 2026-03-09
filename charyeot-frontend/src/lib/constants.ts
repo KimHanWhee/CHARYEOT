@@ -21,5 +21,5 @@ export interface GameTab {
 export const GAME_TABS: GameTab[] = [
   { id: 'LOL', name: 'League of Legends', shortName: 'LoL', path: GAME_PATHS.LOL, available: true },
   { id: 'VALORANT', name: 'Valorant', shortName: 'Valorant', path: GAME_PATHS.VALORANT, available: false },
-  { id: 'ETERNAL_RETURN', name: 'Eternal Return', shortName: 'ER', path: GAME_PATHS.ETERNAL_RETURN, available: false },
+  { id: 'ETERNAL_RETURN', name: 'Eternal Return', shortName: 'ER', path: GAME_PATHS.ETERNAL_RETURN, available: true },
 ];

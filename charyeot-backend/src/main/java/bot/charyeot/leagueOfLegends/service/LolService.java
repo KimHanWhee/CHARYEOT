@@ -1,7 +1,6 @@
 package bot.charyeot.leagueOfLegends.service;
 
-import bot.charyeot.leagueOfLegends.entity.response.*;
-import lombok.RequiredArgsConstructor;
+import bot.charyeot.leagueOfLegends.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;

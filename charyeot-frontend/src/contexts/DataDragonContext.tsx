@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { fetchDataDragonVersion } from '../api/PlayerApi';
+import { fetchDataDragonVersion } from '../api/lol/LolApi';
 
 interface DataDragonContextValue {
   version: string;

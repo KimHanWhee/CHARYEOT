@@ -26,11 +26,12 @@ export function Layout({ children }: LayoutProps) {
   const buildSearchPath = (name: string, tag: string) => {
     if (!name.trim()) return;
     const game = GAME_TABS.find(g => g.id === selectedGame);
-    // const query = needsTag && tag.trim()
-    //   ? `${name.trim()}#${tag.trim()}`
-    //   : name.trim();
-    const userTag = tag.trim() || "KR1";
-    return `/${game?.path || GAME_PATHS.LOL}/search/${encodeURIComponent(name.trim())}/${encodeURIComponent(userTag.trim())}`;
+    const basePath = `/${game?.path || GAME_PATHS.LOL}/search/${encodeURIComponent(name.trim())}`;
+    if (needsTag) {
+      const userTag = tag.trim() || 'KR1';
+      return `${basePath}/${encodeURIComponent(userTag)}`;
+    }
+    return basePath;
   };
 
   const handleGameSelect = (game: GameTab) => {

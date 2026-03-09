@@ -1,10 +1,13 @@
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sword, Eye, Coins, ChevronDown } from 'lucide-react';
+import { Sword, Eye, Coins, ChevronDown, Gavel } from 'lucide-react';
 import { JSX, useState } from 'react';
-import { Match } from '../types/api';
-import { RUNE_MAP, SPELL_MAP } from '../lib/LolUtils';
-import { ParticipantRow, TeamHeader } from './ParticipantRow';
+import { LolCharyeotResponse, Match } from '../types/lol';
+
+import { RUNE_MAP, SPELL_MAP } from '../lib/lolUtils';
+import { fetchLolCharyeot } from '../api/PlayerApi';
+import { ParticipantRow, TeamHeader } from './lol/ParticipantRow';
+import { VerdictModal } from './lol/VerdictModal';
 
 interface MatchCardProps {
   match: Match;
@@ -14,6 +17,24 @@ interface MatchCardProps {
 
 export function MatchCard({ match, targetPuuid, version }: MatchCardProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [verdictOpen, setVerdictOpen] = useState(false);
+  const [verdictLoading, setVerdictLoading] = useState(false);
+  const [verdict, setVerdict] = useState<LolCharyeotResponse | null>(null);
+
+  const handleVerdictClick = async (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    setVerdict(null);
+    setVerdictOpen(true);
+    setVerdictLoading(true);
+    try {
+      const result = await fetchLolCharyeot(match.matchId);
+      setVerdict(result);
+    } catch (err) {
+      console.error('판결 요청 실패:', err);
+    } finally {
+      setVerdictLoading(false);
+    }
+  };
 
   const searchUser = match.participantsDTO.find((p) => p.puuid === targetPuuid);
   if (!searchUser) return <></>;
@@ -170,6 +191,17 @@ export function MatchCard({ match, targetPuuid, version }: MatchCardProps): JSX.
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
+            {/* 판결 버튼 */}
+            <div className="flex justify-end px-4 pt-3 pb-1 bg-white dark:bg-slate-900/80">
+              <button
+                onClick={handleVerdictClick}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold transition-colors shadow-sm"
+              >
+                <Gavel size={13} />
+                차렷봇 판결하기
+              </button>
+            </div>
+
             {/* 블루팀 */}
             <div className={cn(
               "px-2 py-2",
@@ -212,6 +244,14 @@ export function MatchCard({ match, targetPuuid, version }: MatchCardProps): JSX.
           </motion.div>
         )}
       </AnimatePresence>
+
+      <VerdictModal
+        isOpen={verdictOpen}
+        isLoading={verdictLoading}
+        verdict={verdict}
+        version={version}
+        onClose={() => setVerdictOpen(false)}
+      />
     </div>
   );
 }
