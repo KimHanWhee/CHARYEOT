@@ -9,6 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CharacterStat {
     private int characterCode;
+    private String korCharacterName;
+    private String engCharacterName;
     private int totalGames;
     private int maxKillings;
     private int wins;

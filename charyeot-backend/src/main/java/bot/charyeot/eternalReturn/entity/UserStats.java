@@ -12,7 +12,6 @@ import java.util.List;
 public class UserStats {
     private int seasonId;
     private int mmr;
-    private String nickname;
     private int rank;
     private int rankSize;
     private int totalGames;

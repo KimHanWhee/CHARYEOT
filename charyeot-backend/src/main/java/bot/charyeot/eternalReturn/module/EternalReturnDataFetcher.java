@@ -1,6 +1,7 @@
 package bot.charyeot.eternalReturn.module;
 
 import bot.charyeot.eternalReturn.config.NimbleWebClientConfig;
+import bot.charyeot.eternalReturn.entity.enums.TacticalSkillCode;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.annotation.PostConstruct;
@@ -25,8 +26,18 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class EternalReturnDataFetcher {
     private final NimbleWebClientConfig nimbleWebClientConfig;
-    private Map<String, String> krCharacterMap = new HashMap<>();
-    private Map<String, String> enCharacterMap = new HashMap<>();
+    // 캐릭터
+    private final Map<Integer, String> krCharacterMap = new HashMap<>();
+    private final Map<Integer, String> enCharacterMap = new HashMap<>();
+    // 아이템
+    private final Map<Integer, String> krItemMap = new HashMap<>();
+    private final Map<Integer, String> enItemMap = new HashMap<>();
+    // 전술스킬
+    private final Map<Integer, String> krTacticalSkillMap = new HashMap<>();
+    private final Map<Integer, String> enTacticalSkillMap = new HashMap<>();
+    // 특성
+    private final Map<Integer, String> krTraitMap = new HashMap<>();
+    private final Map<Integer, String> enTraitMap = new HashMap<>();
     private final RestTemplate restTemplate = new RestTemplate();
 
     @PostConstruct
@@ -38,10 +49,16 @@ public class EternalReturnDataFetcher {
         log.info(krCharacterMap.toString());
 
         String engRawData = fetchData("English");
-        if (korRawData != null && !korRawData.isEmpty()) {
+        if (engRawData != null && !engRawData.isEmpty()) {
             parseCharacterData(engRawData, "English");
+            parseItemData(engRawData, "English");
+            parseTacticalSkillData(engRawData, "English");
+            parseTraitData(engRawData, "English");
         }
         log.info(enCharacterMap.toString());
+        log.info(enItemMap.toString());
+        log.info(enTacticalSkillMap.toString());
+        log.info(enTraitMap.toString());
     }
 
     public String fetchData(String language) {
@@ -58,7 +75,7 @@ public class EternalReturnDataFetcher {
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
             // 2. l10Path 요청
-            String apiUrl = nimbleWebClientConfig.getEndPoint() + "/v1/l10n/" + language;
+            String apiUrl = nimbleWebClientConfig.getUrl() + "/v1/l10n/" + language;
             ResponseEntity<String> apiResponse = restTemplate.exchange(
                     apiUrl,
                     HttpMethod.GET,
@@ -101,9 +118,9 @@ public class EternalReturnDataFetcher {
             String id = matcher.group(1);     // 숫자 ID
             String name = matcher.group(2); // 캐릭터 이름
             if(language.equals("English")) {
-                enCharacterMap.put(id, name);
+                enCharacterMap.put(Integer.parseInt(id), name);
             } else {
-                krCharacterMap.put(id, name);
+                krCharacterMap.put(Integer.parseInt(id), name);
             }
         }
 
@@ -114,19 +131,105 @@ public class EternalReturnDataFetcher {
         }
     }
 
-    public String getKorCharacterName(String id) {
-        return krCharacterMap.getOrDefault(id, "알 수 없는 캐릭터");
+    private void parseItemData(String data, String language) {
+        Pattern pattern;
+        // 정규표현식: Item/Name/숫자 형태 뒤의 한글(또는 문자열) 추출
+        if (language.equals("English")) {
+            pattern = Pattern.compile("Item/Name/(\\d+)[^\\p{L}\\p{N}]*?([\\p{L}\\p{N}\\s&'\\-]+?)(?=\\s*(?:Character/|GameResult|\\r|\\n|$))");
+//            pattern = Pattern.compile("Item/Name/(\\d+)[^\\p{L}\\p{N}]*?([\\p{L}\\p{N}\\s&'\\-]+)");
+        } else {
+            pattern = Pattern.compile("Item/Name/(\\d+)[^가-힣]*([가-힣]+)");
+        }
+        Matcher matcher = pattern.matcher(data);
+
+        while (matcher.find()) {
+            String id = matcher.group(1);     // 숫자 ID
+            String name = matcher.group(2); // 아이템 이름
+            if(language.equals("English")) {
+                enItemMap.put(Integer.parseInt(id), name);
+            } else {
+                krItemMap.put(Integer.parseInt(id), name);
+            }
+        }
+
+        if (language.equals("English")) {
+            log.info("성공적으로 {}개의 아이템 정보를 맵에 저장했습니다.", enItemMap.size());
+        } else {
+            log.info("성공적으로 {}개의 아이템 정보를 맵에 저장했습니다.", krItemMap.size());
+        }
     }
 
-    public String getEngCharacterName(String id) {
-        return krCharacterMap.getOrDefault(id, "알 수 없는 캐릭터");
+
+    private void parseTacticalSkillData(String data, String language) {
+        // 2. Enum 전체 순회 (values() 호출)
+        for (TacticalSkillCode mapping : TacticalSkillCode.values()) {
+            int slot = mapping.getKey();
+            int code = mapping.getValue();
+            Pattern pattern = Pattern.compile("Skill/Group/Name/" + code + "\\┃([^|\r\n]+)");
+            Matcher matcher = pattern.matcher(data);
+
+            if (matcher.find()) {
+                String skillName = matcher.group(1).trim();
+                if (language.equals("English")) {
+                    enTacticalSkillMap.put(slot, skillName);
+                } else {
+                    krTacticalSkillMap.put(slot, skillName);
+                }
+            }
+        }
+
+        if (language.equals("English")) {
+            log.info("성공적으로 {}개의 전술스킬 정보를 맵에 저장했습니다.", enTacticalSkillMap.size());
+        } else {
+            log.info("성공적으로 {}개의 전술스킬 정보를 맵에 저장했습니다.", krTacticalSkillMap.size());
+        }
     }
 
-    public String getEngCharacterId(String characterName) {
-        return krCharacterMap.entrySet().stream()
-                .filter(entry -> characterName.equals(entry.getValue()))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse("알 수 없는 ID");
+    private void parseTraitData(String data, String language) {
+        Pattern pattern;
+        // 정규표현식: Character/Name/숫자 형태 뒤의 한글(또는 문자열) 추출
+        if (language.equals("English")) {
+            pattern = Pattern.compile("Trait/Name/(\\d+)[^a-zA-Z]*([a-zA-Z\\s&'-]+?)(?=\\s*Character/|\\s*GameResult|\\r|\\n|$)");
+        } else {
+            pattern = Pattern.compile("Trait/Name/(\\d+)[^가-힣]*([가-힣]+)");
+        }
+        Matcher matcher = pattern.matcher(data);
+
+        while (matcher.find()) {
+            String id = matcher.group(1);     // 숫자 ID
+            String name = matcher.group(2); // 캐릭터 이름
+            if(language.equals("English")) {
+                enTraitMap.put(Integer.parseInt(id), name);
+            } else {
+                krTraitMap.put(Integer.parseInt(id), name);
+            }
+        }
+
+        if (language.equals("English")) {
+            log.info("성공적으로 {}개의 특성 정보를 맵에 저장했습니다.", enTraitMap.size());
+        } else {
+            log.info("성공적으로 {}개의 특성 정보를 맵에 저장했습니다.", krTraitMap.size());
+        }
     }
- }
+
+
+    public String getKorCharacterName(int id) {
+        return krCharacterMap.getOrDefault(id, "Unknown Character");
+    }
+
+    public String getEngCharacterName(int id) {
+        return enCharacterMap.getOrDefault(id, "Unknown Character");
+    }
+
+    public String getEngItemName(Integer itemId) {
+        return enItemMap.getOrDefault(itemId, "Unknown Item");
+    }
+
+    public String getEngTacticalSkillName(Integer code) {
+        return enTacticalSkillMap.getOrDefault(code, "Unknown Skill");
+    }
+
+    public String getEngTraitName(Integer code) {
+        return enTraitMap.getOrDefault(code, "Unknown Trait");
+    }
+}
