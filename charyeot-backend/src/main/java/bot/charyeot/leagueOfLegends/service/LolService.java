@@ -33,19 +33,8 @@ public class LolService {
             List<String> matchIdList = getRecentMatchIdsByPuuid(puuid);
 
             for (String matchId : matchIdList) {
-                // 2. 각 매치 ID로 상세 데이터 호출
                 MatchDTO matchDTO = getMatchByMatchId(matchId);
 
-                // 3. 전체 참가자 중 검색 중인 유저(puuid)의 정보만 필터링
-//                matchDTO.getInfo().getParticipants().stream()
-//                        .filter(p -> p.getPuuid().equals(puuid))
-//                        .findFirst()
-//                        .ifPresent(me -> {
-//                            // 4. 찾은 내 정보(me)와 매치 정보(matchDTO)를 조합해 DTO 생성
-//                            // MatchListDTO 생성자에서 필요한 처리를 한다고 가정합니다.
-//                            MatchListDTO matchListDTO = new MatchListDTO(matchDTO, me);
-//                            result.add(matchListDTO);
-//                        });
                 MatchListDTO matchListDTO = new MatchListDTO(matchDTO);
                 result.add(matchListDTO);
             }
@@ -97,9 +86,17 @@ public class LolService {
 
     public SummonerDTO getSummoner(String puuid) {
         return riotKrWebClient.get()
-                .uri("https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}", puuid)
+                .uri("/lol/summoner/v4/summoners/by-puuid/{puuid}", puuid)
                 .retrieve()
                 .bodyToMono(SummonerDTO.class)
+                .block();
+    }
+
+    public List<LeagueEntryDTO> getRankInfo(String puuid) {
+        return riotKrWebClient.get()
+                .uri("/lol/league/v4/entries/by-puuid/{puuid}", puuid)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<LeagueEntryDTO>>() {})
                 .block();
     }
 
@@ -108,7 +105,8 @@ public class LolService {
         try {
             AccountDTO accountDTO = getSummonerAccount(gameName, tagLine);
             SummonerDTO summonerDTO = getSummoner(accountDTO.getPuuid());
-            ProfileDTO result = new ProfileDTO(accountDTO, summonerDTO);
+            List<LeagueEntryDTO> leagueEntries = getRankInfo(accountDTO.getPuuid());
+            ProfileDTO result = new ProfileDTO(accountDTO, summonerDTO, leagueEntries);
             log.info("Find {}#{}'s profile info : {}", result.getGameName(), result.getTagLine(), result);
             return result;
         } catch (Exception e) {

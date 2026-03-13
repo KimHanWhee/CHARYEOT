@@ -3,6 +3,8 @@
 // ============================================================
 export interface CharacterStat {
   characterCode: number;
+  korCharacterName: string;
+  engCharacterName: string;
   totalGames: number;
   maxKillings: number;
   wins: number;
@@ -12,7 +14,7 @@ export interface CharacterStat {
 export interface UserSearchData {
   userInfo: UserInfo;
   userStats: UserStats[];
-  battleUserResults: BattleUserResult[];
+  battleUserResponses: BattleUserResponse[];
 }
 
 export interface UserInfo {
@@ -33,26 +35,41 @@ export interface UserStats {
 }
 
 // ============================================================
-// 전적 (BattleUserResult)
+// 전적 (BattleUserResponse)
 // ============================================================
-export interface BattleUserResult {
+export interface BattleUserResponse {
   nickname: string;
   accountLevel: number;
   gameId: number;
   matchingMode: number;
   seasonId: number;
   characterNum: number;
+  engCharacterName: string;
+  korCharacterName: string;
   skinCode: number;
   characterLevel: number;
   gameRank: number;
+  teamKill: number;
   playerKill: number;
   playerAssistant: number;
+  playerDeaths: number;
   monsterKill: number;
-  equipment: Record<number, number>;
-  playTime: number;
+  endTime: number;
+  duration: number;
   damageToPlayer: number;
   damageFromPlayer: number;
   damageToMonster: number;
   totalGainVFCredit: number;
   totalUseVFCredit: number;
+  tacticalSkillName: string;
+  tacticalSkillLevel: number;
+  weaponName: string;
+  mainTrait: string;
+  subTrait: string;
+  itemList: ItemDetail[];
+}
+
+export interface ItemDetail {
+  name: string;
+  grade: number;
 }

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { MatchCard } from '../../components/lol/MatchCard';
-import { PlayerProfile } from '../../components/shared/PlayerProfile';
+import { RankTierCard } from '../../components/lol/RankTierCard';
+import { PlayerProfile } from '../../components/lol/PlayerProfile';
 import { fetchMatches, fetchPlayerProfile } from '../../api/lol/LolApi';
 import { Match, Profile } from '../../types/lol';
 import { useDataDragon } from '../../contexts/DataDragonContext';
@@ -96,23 +97,34 @@ export function LolSearchResultsPage() {
           <p className="text-slate-500 dark:text-slate-400 text-sm">전적 불러오는 중...</p>
         </motion.div>
       ) : (
-        <>
-          <div className="flex items-center justify-between">
-            <p className="text-slate-500 text-sm">최근 전적</p>
-            <span className="text-slate-500 text-sm">{matches.length} 게임 검색 됨</span>
-          </div>
-
-          <div className="grid gap-4">
-            {matches.map((match) => (
-              <MatchCard
-                key={match.matchId}
-                match={match}
-                targetPuuid={profile.puuid}
-                version={version}
+        <div className="flex flex-col xl:flex-row gap-4 items-start">
+          {/* 좌측: 랭크 티어 (xl 이상에서 sticky 사이드바) */}
+          {profile && (
+            <div className="w-full xl:w-48 xl:flex-shrink-0 xl:sticky xl:top-4">
+              <RankTierCard
+                leagueEntries={profile.leagueEntries}
               />
-            ))}
+            </div>
+          )}
+
+          {/* 우측: 최근 전적 */}
+          <div className="flex-1 min-w-0 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <p className="text-slate-500 text-sm">최근 전적</p>
+              <span className="text-slate-500 text-sm">{matches.length} 게임 검색 됨</span>
+            </div>
+
+            <div className="grid gap-4">
+              {matches.map((match) => (
+                <MatchCard
+                  match={match}
+                  targetPuuid={profile.puuid}
+                  version={version}
+                />
+              ))}
+            </div>
           </div>
-        </>
+        </div>
       )}
     </motion.div>
   );

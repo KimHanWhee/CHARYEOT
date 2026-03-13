@@ -104,7 +104,7 @@ export function VerdictModal({ isOpen, isLoading, verdict, version, onClose }: V
                           {player.champion}
                         </span>
                         <span className="inline-block self-start px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-semibold">
-                          차렷 점수 {player.score}점
+                          범죄 점수 {player.score}점
                         </span>
                       </div>
                     </div>

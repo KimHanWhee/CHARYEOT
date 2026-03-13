@@ -17,5 +17,5 @@ import java.util.List;
 public class UserSearchData {
     private UserInfo userInfo;
     private List<UserStats> userStats;
-    private List<BattleUserResult> battleUserResults;
+    private List<BattleUserResponse> battleUserResponses;
 }

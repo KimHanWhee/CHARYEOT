@@ -16,8 +16,8 @@ import java.time.Duration;
 public class NimbleWebClientConfig {
     @Value("${external.nimble.api-key}")
     private String apiKey;
-    @Value("${external.nimble.end-point}")
-    private String endPoint;
+    @Value("${external.nimble.url}")
+    private String url;
 
     @Bean("nimbleWebClient")
     public WebClient nimbleWebClient() {
@@ -26,7 +26,7 @@ public class NimbleWebClientConfig {
                 .responseTimeout(Duration.ofSeconds(30));
 
         return WebClient.builder()
-                .baseUrl(endPoint)
+                .baseUrl(url)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .defaultHeader("X-API-KEY", apiKey)
                 .build();

@@ -8,10 +8,11 @@ import bot.charyeot.leagueOfLegends.entity.MatchDTO;
 import bot.charyeot.leagueOfLegends.entity.ParticipantsDTO;
 import bot.charyeot.leagueOfLegends.module.LolItemInfoFetcher;
 import com.google.genai.Client;
+import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,20 +20,15 @@ import java.util.List;
 @Slf4j
 @Service
 public class GeminiService {
-
-    @Value("${gemini.api.key}")
-    private String apiKey;
-
-    @Value("${gemini.api.url}")
-    private String apiUrl;
-
 //    private final WebClient geminiWebClient;
 
+    private final GenerateContentConfig lolConfig;
     private final PromptLoader promptLoader;
     private final Client client;
     private final LolItemInfoFetcher lolItemInfoFetcher;
 
-    public GeminiService(PromptLoader promptLoader, Client client, LolItemInfoFetcher lolItemInfoFetcher) {
+    public GeminiService(@Qualifier("lolConfig") GenerateContentConfig lolConfig, PromptLoader promptLoader, Client client, LolItemInfoFetcher lolItemInfoFetcher) {
+        this.lolConfig = lolConfig;
 //        this.geminiWebClient = geminiWebClient;
         this.promptLoader = promptLoader;
         this.client = client;
@@ -40,44 +36,31 @@ public class GeminiService {
     }
 
     public String getJudgment(GameType game, String matchDataJson) {
-        String basePrompt;
-
-        switch (game) {
-            case LEAGUE_OF_LEGENDS -> basePrompt = promptLoader.getLeagueOfLegendsPrompt();
-            case VALORANT -> basePrompt = promptLoader.getValorantPrompt();
-            case ETERNAL_RETURN -> basePrompt = promptLoader.getEternalReturnPrompt();
-            default -> basePrompt = "";
-        }
-        String finalPrompt = basePrompt + "\n\n분석할 데이터:\n" + matchDataJson;
-
+        // 1. 게임 타입에 따라 미리 구워진(Pre-baked) Config 선택
+        GenerateContentConfig selectedConfig = switch (game) {
+            case LEAGUE_OF_LEGENDS -> lolConfig;
+            case VALORANT -> lolConfig;
+            case ETERNAL_RETURN -> lolConfig;
+        };
 
         GenerateContentResponse response = client.models.generateContent(
                 "gemini-3-flash-preview",
-                finalPrompt,
-                null
+                "분석할 데이터:\n" + matchDataJson,
+                selectedConfig
         );
+
         log.info("응답 도착 response : {}", response);
+
+        // 3. 비용 모니터링 (Optional 처리)
+        response.usageMetadata().ifPresent(usage -> {
+            int input = usage.promptTokenCount().orElse(0);
+            int output = usage.candidatesTokenCount().orElse(0);
+            int total = usage.totalTokenCount().orElse(0);
+
+            log.info("비용 분석 - 입력: {}, 출력: {}, 총합: {}", input, output, total);
+        });
+
         return response.text();
-
-//        GeminiRequest request = new GeminiRequest(finalPrompt);
-//        return geminiWebClient.post()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path("/v1beta/models/gemini-1.5-flash:generateContent")
-//                        .queryParam("key", apiKey)
-//                        .build())
-//                .bodyValue(request)
-//                .retrieve()
-//                .bodyToMono(GeminiResponse.class)
-//                .map(response -> {
-//                    if (response != null && !response.candidates().isEmpty()) {
-//                        return response.candidates().get(0).content().parts().get(0).text();
-//                    }
-//                    return "판사의 말문이 막혔습니다. 대체 얼마나 심각했던 건지..";
-//                })
-//                .onErrorReturn("판사가 쓰러졌습니다.")
-//                .block();
-
-
     }
 
     public LolCharyeotResponse getLolJudgement(MatchDTO matchDTO) {

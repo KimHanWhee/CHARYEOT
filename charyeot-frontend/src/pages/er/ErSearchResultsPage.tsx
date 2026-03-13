@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { fetchErUserSearchData } from '../../api/er/ErApi';
-import { UserStats, BattleUserResult } from '../../types/er';
+import { UserStats, UserInfo, BattleUserResponse } from '../../types/er';
+import { PlayerProfile } from '@/src/components/er/PlayerProfile';
+import { MatchCard } from '../../components/er/MatchCard';
 
 export function ErSearchResultsPage() {
   const { summonerName: nickname } = useParams<{ summonerName: string }>();
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
-  const [games, setGames] = useState<BattleUserResult[]>([]);
+  const [games, setGames] = useState<BattleUserResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,6 +18,7 @@ export function ErSearchResultsPage() {
     if (!nickname) return;
     setIsLoading(true);
     setError(null);
+    setUser(null);
     setStats(null);
     setGames([]);
 
@@ -23,8 +27,9 @@ export function ErSearchResultsPage() {
         const [searchData] = await Promise.all([
           fetchErUserSearchData(nickname)
         ]);
+        setUser(searchData.userInfo);
         setStats(searchData.userStats[0]);
-        setGames(searchData.battleUserResults);
+        setGames(searchData.battleUserResponses);
       } catch (err) {
         console.error('ER 전적 조회 실패:', err);
         setError('플레이어 정보를 불러오지 못했습니다.');
@@ -68,18 +73,12 @@ export function ErSearchResultsPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* 유저 프로필 */}
-      {stats && (
-        <div className="flex items-center gap-5 p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 shadow-md">
-          <div>
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">{nickname}</span>
-            <span>LV.{games[0].accountLevel}</span>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              MMR {stats.mmr} · 랭크 {stats.rank} / {stats.rankSize}
-              · 총 {stats.totalGames}게임 · {stats.totalWins}승
-            </p>
-          </div>
-        </div>
+      {stats && games && (
+        <PlayerProfile
+          name={user.nickname}
+          level={games[0]?.accountLevel ?? 0}
+          mostPlayeCharacterName={stats.characterStats[0].engCharacterName}
+        />
       )}
 
       {/* 전적 목록 */}
@@ -90,28 +89,7 @@ export function ErSearchResultsPage() {
 
       <div className="grid gap-4">
         {games.map((game) => (
-          <div
-            key={game.gameId}
-            className={`rounded-xl border-l-4 shadow-lg bg-white dark:bg-slate-900/80 p-4 ${
-              game.gameRank === 1 ? 'border-emerald-500' : 'border-rose-500'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-lg font-bold ${game.gameRank === 1 ? 'text-emerald-500' : 'text-slate-700 dark:text-slate-200'}`}>
-                  {game.gameRank}위
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  캐릭터 #{game.characterNum} · Lv.{game.characterLevel}
-                  · {Math.floor(game.playTime / 60)}분 {game.playTime % 60}초
-                </p>
-              </div>
-              <div className="text-right text-sm text-slate-600 dark:text-slate-300 space-y-0.5">
-                <p>킬 {game.playerKill} · 어시 {game.playerAssistant}</p>
-                <p>딜량 {game.damageToPlayer.toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
+          <MatchCard game={game} />
         ))}
       </div>
     </motion.div>

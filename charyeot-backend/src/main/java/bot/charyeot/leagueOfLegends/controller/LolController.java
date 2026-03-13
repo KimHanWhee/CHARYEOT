@@ -20,10 +20,6 @@ import java.util.List;
 public class LolController {
 
     private final LolService lolService;
-//    @PostMapping("/summoner/{userName}")
-//    private Void getSummonerRecord(@PathVariable String summonerName) {
-//
-//    }
 
     @GetMapping("/summoner/profile/{summonerName}/{summonerTag}")
     private ResponseEntity<ProfileDTO> getSummonerProfile(@PathVariable("summonerName") String summonerName,

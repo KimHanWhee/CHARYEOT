@@ -13,11 +13,11 @@ export const SPELL_MAP: Record<number, string> = {
 
 export const RUNE_MAP: Record<number, string> = {
   // --- 보조 룬 스타일 (큰 틀) ---
-  8000: "7201_Precision",      // 정밀
-  8100: "7200_Domination",     // 지배
-  8200: "7202_Sorcery",        // 마법
-  8300: "7203_Whimsy",         // 영감
-  8400: "7204_Resolve",        // 결의
+  8000: "7201_Precision", // 정밀
+  8100: "7200_Domination", // 지배
+  8200: "7202_Sorcery", // 마법
+  8300: "7203_Whimsy", // 영감
+  8400: "7204_Resolve", // 결의
 
   // --- 핵심 룬 (Keystone) ---
   // 지배
