@@ -1,91 +1,80 @@
 import requests
 import os
+import boto3
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ============================================================
 # 설정
 # ============================================================
-API_KEY = 여기에_API_KEY_입력
-CHARACTER_FOLDER_ID = 1m__ubKg-KY7TqnqbFqwHi1DVxrdBeTEW
-ITEM_FOLDER_ID = 10rqsRCIYjD0Xja9Thy6hOPP7Nanrkej5
-OUTPUT_FILE = eternal_return_urls.properties
+INPUT_FILE           = "skinUrl.properties"
 
-BASE_URL = httpswww.googleapis.comdrivev3files
+R2_ACCESS_KEY_ID     = os.getenv("R2_ACCESS_KEY_ID", "a0fce78f0c39b1c6ed8b6aa5b10203ad")
+R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "133ee09853e6b80f847192ac65197ba412b4ce24dd91e00bceb1d1ba7fd7ba71")
+R2_ACCOUNT_ID        = "d29a012adeba4af078bdab06e85f92c2"
+R2_BUCKET_NAME       = "eternal-return-images"
+R2_PUBLIC_URL        = "https://pub-ec9311e4416d473a9cdd54c206eb2fef.r2.dev"
+
+# ============================================================
+# R2 클라이언트 초기화
+# ============================================================
+s3 = boto3.client(
+    "s3",
+    endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+    aws_access_key_id=R2_ACCESS_KEY_ID,
+    aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+    region_name="auto",
+)
 
 total_count = 0
+fail_count = 0
 
 
-def fetch_files_in_folder(folder_id str, category str, image_map dict)
-    폴더 내 파일을 재귀적으로 탐색해서 PNG만 수집
-    global total_count
+def upload_to_r2(key: str, drive_url: str):
+    """구글 드라이브에서 이미지 다운로드 후 R2에 업로드"""
+    try:
+        img_response = requests.get(drive_url, timeout=30)
+        img_response.raise_for_status()
 
-    print(f📂 [{category}] 폴더 탐색 중 {folder_id})
+        s3.put_object(
+            Bucket=R2_BUCKET_NAME,
+            Key=f"{key}.png",
+            Body=img_response.content,
+            ContentType="image/png",
+        )
 
-    page_token = None
-    while True
-        params = {
-            q f'{folder_id}' in parents and trashed = false,
-            fields nextPageToken, files(id, name, mimeType),
-            key API_KEY,
-            pageSize 1000,
-        }
-        if page_token
-            params[pageToken] = page_token
+        return f"{R2_PUBLIC_URL}/{key}.png"
 
-        response = requests.get(BASE_URL, params=params)
-        response.raise_for_status()
-        data = response.json()
-
-        files = data.get(files, [])
-        if not files
-            break
-
-        for file in files
-            mime = file[mimeType]
-            name = file[name]
-            file_id = file[id]
-
-            if mime == applicationvnd.google-apps.folder
-                # 하위 폴더 재귀 탐색
-                fetch_files_in_folder(file_id, category, image_map)
-
-            elif name.lower().endswith(.png)
-                # 확장자 제거 후 URL 저장
-                key = name.rsplit(., 1)[0]
-                url = fhttpsdrive.google.comucexport=view&id={file_id}
-                image_map[key] = url
-
-                total_count += 1
-                print(f  [{total_count}] {key})
-
-        page_token = data.get(nextPageToken)
-        if not page_token
-            break
+    except Exception as e:
+        print(f"  ❌ 실패 [{key}]: {e}")
+        return None
 
 
-def save_to_properties(image_map dict, output_file str)
-    key=value 형태로 파일 저장
-    print(fn💾 파일 저장 중 {output_file})
-    with open(output_file, w, encoding=utf-8) as f
-        for key, url in sorted(image_map.items())
-            f.write(f{key}={url}n)
-    print(f✅ 저장 완료 {len(image_map)}개)
+def main():
+    global total_count, fail_count
+
+    print("========================================")
+    print("🚀 이터널리턴 이미지 R2 업로드 시작")
+    print("========================================\n")
+
+    with open(INPUT_FILE, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]
+
+    print(f"📄 총 {len(lines)}개 항목 로드\n")
+
+    for line in lines:
+        key, drive_url = line.split("=", 1)
+        r2_url = upload_to_r2(key, drive_url)
+        if r2_url:
+            total_count += 1
+            print(f"  [{total_count}] ✅ {key}")
+        else:
+            fail_count += 1
+
+    print(f"\n✅ 업로드 완료: {total_count}개")
+    print(f"❌ 실패: {fail_count}개")
 
 
-def main()
-    print(========================================)
-    print(🚀 이터널리턴 이미지 URL 수집 시작)
-    print(========================================n)
-
-    image_map = {}
-
-    fetch_files_in_folder(CHARACTER_FOLDER_ID, 캐릭터, image_map)
-    fetch_files_in_folder(ITEM_FOLDER_ID, 아이템, image_map)
-
-    save_to_properties(image_map, OUTPUT_FILE)
-
-    print(fn총 수집 이미지 {total_count}개)
-    print(f결과 파일 {OUTPUT_FILE})
-
-
-if __name__ == __main__
+if __name__ == "__main__":
     main()

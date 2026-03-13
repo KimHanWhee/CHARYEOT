@@ -59,7 +59,7 @@ export function HomePage() {
           {/* 이름 입력 */}
           <input
             type="text"
-            placeholder="소환사명"
+            placeholder="플레이어명"
             className="flex-1 min-w-0 bg-transparent border-none p-4 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-0"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -100,8 +100,8 @@ export function HomePage() {
         <p className="text-center text-md font-bold text-slate-600 dark:text-slate-300 mb-2">
           ※ 참고해주세요.
         </p>
-        <p>* 본 사이트는 제한된 데이터로 AI 판단하며 서로에 대한 비판보다는 단순 재미로만 이용해주시기 바랍니다.</p>
-        <p>* 본 사이트는 라이엇 게임즈, 님블 뉴런 등 공식 게임사와는 연관이 없는 사이트 입니다.</p>
+        <p>* 본 사이트는 AI가 제한된 데이터만을 기반으로 분석하므로, 결과를 서로 비난하는 용도가 아닌 가벼운 재미로만 즐겨주세요</p>
+        <p>* 본 사이트는 라이엇 게임즈, 님블 뉴런 등 공식 게임사와는 연관이 없는 사이트입니다.</p>
       </div>
     </motion.div>
   );

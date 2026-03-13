@@ -8,6 +8,7 @@ export interface Profile {
   profileIconId: number;
   revisionDate: number;
   summonerLevel: number;
+  leagueEntries: LeagueEntry[];
 }
 
 // ============================================================
@@ -49,6 +50,7 @@ export interface Match {
   matchId: string;
   duration: number;
   gameMode: string;
+  gameEndTimestamp: number;
   participantsDTO: Participant[];
 }
 
@@ -75,6 +77,18 @@ export interface PerkStyleSelections {
   var1: number;
   var2: number;
   var3: number;
+}
+
+// ============================================================
+// 티어 정보
+// ============================================================
+export interface LeagueEntry {
+  queueType: string;
+  tier: string;
+  rank: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
 }
 
 // ============================================================

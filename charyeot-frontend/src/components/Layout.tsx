@@ -59,7 +59,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none z-0" />
         <div className="fixed inset-0 bg-gradient-to-b from-white/0 via-white/50 to-slate-50 dark:from-slate-900/0 dark:via-slate-900/50 dark:to-[#0a0a0c] pointer-events-none z-0 transition-colors duration-300" />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 py-8 md:py-12">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-12">
           {/* Header */}
           <header className="flex items-center justify-between mb-12">
             {/* Logo */}
@@ -81,7 +81,7 @@ export function Layout({ children }: LayoutProps) {
                     key={game.id}
                     onClick={() => handleGameSelect(game)}
                     className={cn(
-                      "relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200",
+                      "relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs hover:cursor-pointer sm:text-sm font-medium transition-all duration-200",
                       selectedGame === game.id && game.available
                         ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
                         : game.available
@@ -121,7 +121,7 @@ export function Layout({ children }: LayoutProps) {
                     <Search className="ml-3 text-slate-400 flex-shrink-0" size={16} />
                     <input
                       type="text"
-                      placeholder="소환사명..."
+                      placeholder="플레이어명..."
                       value={searchName}
                       onChange={(e) => setSearchName(e.target.value)}
                       className="w-24 lg:w-32 bg-transparent px-2 py-1.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
