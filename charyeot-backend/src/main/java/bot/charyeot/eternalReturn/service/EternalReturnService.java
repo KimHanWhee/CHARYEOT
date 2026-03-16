@@ -108,7 +108,7 @@ public class EternalReturnService {
     public List<BattleUserResponse> getBattleUserResultDetail(Integer gameId) throws Exception {
         try {
             String response = nimbleWebClient.get()
-                    .uri("/v1/games/uid/{gameId}", gameId)
+                    .uri("/v1/games/{gameId}", gameId)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();

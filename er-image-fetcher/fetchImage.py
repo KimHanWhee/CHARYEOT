@@ -8,7 +8,7 @@ load_dotenv()
 # ============================================================
 # 설정
 # ============================================================
-INPUT_FILE           = "skinUrl.properties"
+INPUT_FILE           = "eternal_return_urls.properties"
 
 R2_ACCESS_KEY_ID     = os.getenv("R2_ACCESS_KEY_ID", "a0fce78f0c39b1c6ed8b6aa5b10203ad")
 R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "133ee09853e6b80f847192ac65197ba412b4ce24dd91e00bceb1d1ba7fd7ba71")

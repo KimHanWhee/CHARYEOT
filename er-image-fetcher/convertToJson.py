@@ -1,6 +1,6 @@
 import json
 
-INPUT_FILE = "eternal_return_urls.properties"
+INPUT_FILE = "eternal_return_urls_bakup.properties"
 OUTPUT_FILE = "eternal_return_urls.json"
 
 

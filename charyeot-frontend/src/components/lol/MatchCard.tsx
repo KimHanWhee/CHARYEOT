@@ -56,6 +56,9 @@ export function MatchCard({
   const redTeam = match.participantsDTO.filter((p) => p.teamId === 200);
   const isBlueWin = blueTeam[0]?.win;
 
+  const maxDealt = Math.max(...match.participantsDTO.map((p) => p.totalDamageDealtToChampions));
+  const maxTaken = Math.max(...match.participantsDTO.map((p) => p.totalDamageTaken));
+
   return (
     <div
       className={cn(
@@ -259,6 +262,8 @@ export function MatchCard({
                     participant={p}
                     version={version}
                     isTarget={p.puuid === targetPuuid}
+                    maxDealt={maxDealt}
+                    maxTaken={maxTaken}
                   />
                 ))}
               </div>
@@ -281,6 +286,8 @@ export function MatchCard({
                     participant={p}
                     version={version}
                     isTarget={p.puuid === targetPuuid}
+                    maxDealt={maxDealt}
+                    maxTaken={maxTaken}
                   />
                 ))}
               </div>

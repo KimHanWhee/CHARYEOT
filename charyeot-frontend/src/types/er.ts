@@ -66,7 +66,7 @@ export interface BattleUserResponse {
   weaponName: string;
   mainTrait: string;
   subTrait: string;
-  itemList: ItemDetail[];
+  itemList: Record<string, ItemDetail>;
 }
 
 export interface ItemDetail {

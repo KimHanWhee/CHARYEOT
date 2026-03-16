@@ -1,10 +1,13 @@
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import { BattleUserResponse } from "../../types/er";
 import { ChevronDown, Coins, Eye, Sword } from "lucide-react";
 import { cn, getTimeAgo } from "@/src/lib/utils";
+import { fetchErBattleDetail } from "../../api/er/ErApi";
+import { MatchCardDetail } from "./MatchCardDetail";
 
 interface MatchCardProps {
   game: BattleUserResponse;
+  myNickname: string;
 }
 
 const RANK_STYLE: Record<number, { border: string; text: string }> = {
@@ -18,7 +21,26 @@ const DEFAULT_STYLE = {
   text: "text-slate-400 dark:text-slate-500",
 };
 
-export function MatchCard({ game }: MatchCardProps): JSX.Element {
+export function MatchCard({ game, myNickname }: MatchCardProps): JSX.Element {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [detailPlayers, setDetailPlayers] = useState<BattleUserResponse[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleToggle = async () => {
+    setIsExpanded((prev) => !prev);
+    if (detailPlayers !== null) return; // 이미 불러온 데이터는 재사용
+
+    setIsLoading(true);
+    try {
+      const players = await fetchErBattleDetail(game.gameId);
+      setDetailPlayers(players);
+    } catch (e) {
+      console.error("매치 상세 조회 실패", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const rankStyle = RANK_STYLE[game.gameRank] ?? DEFAULT_STYLE;
   const kda =
     game.playerDeaths === 0
@@ -54,6 +76,8 @@ export function MatchCard({ game }: MatchCardProps): JSX.Element {
 
   const unknownImg = "Emoticon/196. Wait a Meowment...";
 
+  const characterImg = "";
+
   const tacticalSkillName =
     game.tacticalSkillName === "Unknown Skill"
       ? unknownImg
@@ -75,7 +99,10 @@ export function MatchCard({ game }: MatchCardProps): JSX.Element {
     <div
       className={`rounded-xl border-l-4 shadow-lg bg-white dark:bg-slate-900/80 p-4 ${rankStyle.border}`}
     >
-      <div className="flex items-center justify-between">
+      <div
+        className="flex items-center justify-between cursor-pointer select-none"
+        onClick={handleToggle}
+      >
         <div>
           <div className="flex items-center gap-2">
             {/* 순위 & 게임 모드 & 시간 */}
@@ -180,9 +207,9 @@ export function MatchCard({ game }: MatchCardProps): JSX.Element {
           {/* 아이템 */}
           <div className="hidden sm:flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => {
-              const item = game.itemList[i];
+              const item = Object.values(game.itemList)[i];
               const itemName =
-                item?.name === "Unknown Item"
+                !item || item.name === "Unknown Item"
                   ? unknownImg
                   : item.name.split(" - ")[0];
               const itemGrade = item?.grade || 0;
@@ -205,8 +232,30 @@ export function MatchCard({ game }: MatchCardProps): JSX.Element {
               );
             })}
           </div>
+
+          {/* 펼치기 아이콘 */}
+          <ChevronDown
+            className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-200 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+          />
         </div>
       </div>
+
+      {/* 펼쳐진 상세 영역 */}
+      {isExpanded && (
+        isLoading ? (
+          <div className="mt-3 border-t border-slate-200 dark:border-slate-700 pt-3 text-center text-sm text-slate-400 dark:text-slate-500">
+            불러오는 중...
+          </div>
+        ) : detailPlayers ? (
+          <MatchCardDetail players={detailPlayers} myNickname={myNickname} />
+        ) : (
+          <div className="mt-3 border-t border-slate-200 dark:border-slate-700 pt-3 text-center text-sm text-red-400">
+            데이터를 불러오지 못했습니다.
+          </div>
+        )
+      )}
     </div>
   );
 }

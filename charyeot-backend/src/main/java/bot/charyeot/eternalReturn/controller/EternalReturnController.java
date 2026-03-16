@@ -30,7 +30,7 @@ public class EternalReturnController {
         }
     }
 
-    @GetMapping("/battle/detail")
+    @GetMapping("/battle/detail/{gameId}")
     private ResponseEntity<List<BattleUserResponse>> getBattleDetail(@PathVariable("gameId") Integer gameId) {
         try {
             return ResponseEntity.ok(eternalReturnService.getBattleUserResultDetail(gameId));
