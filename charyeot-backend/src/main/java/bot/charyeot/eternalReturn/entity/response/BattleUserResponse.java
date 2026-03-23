@@ -37,6 +37,7 @@ public class BattleUserResponse {
     private int damageToPlayer;
     private int damageFromPlayer;
     private int damageToMonster;
+    private int teamRecover;
     private int totalGainVFCredit;
     private int totalUseVFCredit;
     private String tacticalSkillName;
@@ -46,6 +47,9 @@ public class BattleUserResponse {
     private String subTrait;
     private Map<Integer, ItemDetail> itemList;
     private long endTime;
+    private int transferConsoleFromRevivalUseVFCredit;
+    private int creditRevivalCount;
+    private int creditRevivedOthersCount;
 
     public BattleUserResponse(BattleUserResult battleUserResult) {
         this.nickname = battleUserResult.getNickname();
@@ -66,10 +70,14 @@ public class BattleUserResponse {
         this.damageToPlayer = battleUserResult.getDamageToPlayer();
         this.damageFromPlayer = battleUserResult.getDamageFromPlayer();
         this.damageToMonster = battleUserResult.getDamageToMonster();
+        this.teamRecover = battleUserResult.getTeamRecover();
         this.totalGainVFCredit = battleUserResult.getTotalGainVFCredit();
         this.totalUseVFCredit = battleUserResult.getTotalUseVFCredit();
         this.tacticalSkillLevel = battleUserResult.getTacticalSkillLevel();
         this.weaponName = WeaponType.getEngWeaponName(battleUserResult.getBestWeapon());
         this.endTime = Util.calcEndTime(battleUserResult.getStartDtm(), battleUserResult.getDuration());
+        this.transferConsoleFromRevivalUseVFCredit = battleUserResult.getTransferConsoleFromRevivalUseVFCredit();
+        this.creditRevivalCount = battleUserResult.getCreditRevivalCount();
+        this.creditRevivedOthersCount = battleUserResult.getCreditRevivedOthersCount();
     }
 }

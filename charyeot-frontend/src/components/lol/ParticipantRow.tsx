@@ -1,9 +1,9 @@
 import { cn } from "../../lib/utils";
 import { Coins } from "lucide-react";
-import { Participant } from "../../types/lol";
 import { RUNE_MAP, SPELL_MAP } from "../../lib/lolUtils";
 import { useNavigate } from "react-router-dom";
 import { GAME_PATHS } from "../../lib/constants";
+import { Participant } from "@/src/types/Lol";
 
 // champion(2rem) | spells(1rem) | runes(1rem) | name(1fr) | KDA(90px) | dealt(5rem) | taken(5rem) | cs(2.5rem) | items(180px = 7×24px + 6×2px)
 const GRID_COLS =

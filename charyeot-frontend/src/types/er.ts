@@ -59,6 +59,7 @@ export interface BattleUserResponse {
   damageToPlayer: number;
   damageFromPlayer: number;
   damageToMonster: number;
+  teamRecover: number;
   totalGainVFCredit: number;
   totalUseVFCredit: number;
   tacticalSkillName: string;
@@ -67,9 +68,25 @@ export interface BattleUserResponse {
   mainTrait: string;
   subTrait: string;
   itemList: Record<string, ItemDetail>;
+  transferConsoleFromRevivalUseVFCredit: number;
+  creditRevivalCount: number;
+  creditRevivedOthersCount: number;
 }
 
 export interface ItemDetail {
   name: string;
   grade: number;
+}
+
+export interface ErCharyeotPlayer {
+  accountName: string;
+  korCharacter: string;
+  engCharacter: string;
+  reason: string;
+  description: string;
+  score: string;
+}
+
+export interface ErCharyeotResponse {
+  most_responsible_player: ErCharyeotPlayer;
 }

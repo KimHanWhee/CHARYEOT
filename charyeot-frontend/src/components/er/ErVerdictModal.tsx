@@ -1,22 +1,22 @@
 import { AnimatePresence, motion } from "motion/react";
 import { X, Gavel } from "lucide-react";
-import { LolCharyeotResponse } from "../../types/Lol";
+import { ErCharyeotResponse } from "../../types/er";
 
-interface VerdictModalProps {
+interface ErVerdictModalProps {
   isOpen: boolean;
   isLoading: boolean;
-  verdict: LolCharyeotResponse | null;
-  version: string;
+  verdict: ErCharyeotResponse | null;
+  specialMessage: string | null;
   onClose: () => void;
 }
 
-export function VerdictModal({
+export function ErVerdictModal({
   isOpen,
   isLoading,
   verdict,
-  version,
+  specialMessage,
   onClose,
-}: VerdictModalProps) {
+}: ErVerdictModalProps) {
   const player = verdict?.most_responsible_player;
 
   return (
@@ -59,7 +59,20 @@ export function VerdictModal({
 
               {/* Content */}
               <div className="p-6">
-                {isLoading ? (
+                {specialMessage ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center justify-center py-10 gap-4 text-center"
+                  >
+                    <span>
+                      <img src="https://pub-ec9311e4416d473a9cdd54c206eb2fef.r2.dev/Emoticon/384.%20NiaH%20GG.png" />
+                    </span>
+                    <p className="text-xl font-bold text-slate-800 dark:text-slate-100 leading-snug">
+                      {specialMessage}
+                    </p>
+                  </motion.div>
+                ) : isLoading ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-4">
                     <motion.div
                       animate={{ rotate: 360 }}
@@ -74,53 +87,60 @@ export function VerdictModal({
                       차렷봇 판결 중...
                     </p>
                   </div>
-                ) : player ? (
+                ) : verdict ? (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col gap-5"
                   >
-                    {/* 상단: 챔피언 이미지(좌) + 소환사 정보(우) */}
-                    <div className="flex items-center gap-5">
-                      {/* Champion image + stamp */}
-                      <div className="relative w-28 h-28 flex-shrink-0 rounded-xl overflow-hidden shadow-lg border-2 border-rose-500">
+                    {/* 상단: 캐릭터 이미지(좌) + 유저 정보(우) */}
+                    <div className="flex items-center justify-center gap-5">
+                      {/* 캐릭터 이미지 + 유죄 스탬프 + 이모티콘 */}
+                      <div className="flex flex-col items-center gap-1 flex-shrink-0">
                         <img
-                          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${player.champion}.png`}
-                          alt={player.champion}
-                          className="w-full h-full object-cover"
+                          src="https://pub-ec9311e4416d473a9cdd54c206eb2fef.r2.dev/Emoticon/196.%20Wait%20a%20Meowment....png"
+                          className="w-15 h-15 object-contain"
                         />
-                        <motion.div
-                          initial={{ opacity: 0, scale: 3, rotate: -15 }}
-                          animate={{ opacity: 1, scale: 1.5, rotate: -15 }}
-                          transition={{
-                            delay: 0.4,
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 20,
-                          }}
-                          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                        >
-                          <span className="border-4 border-rose-500 text-rose-500 font-black text-3xl px-3 py-1.5 mix-blend-multiply dark:mix-blend-screen opacity-95 tracking-tighter uppercase leading-none">
-                            유죄
-                          </span>
-                        </motion.div>
+                        <div className="relative w-28 h-28 rounded-xl overflow-hidden shadow-lg border-2 border-rose-500">
+                          <img
+                            src={`https://pub-ec9311e4416d473a9cdd54c206eb2fef.r2.dev/${player.engCharacter.replace(/ & /g, "")}_Mini_00.png`}
+                            alt={player.engCharacter}
+                            className="w-full h-full object-cover"
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, scale: 3, rotate: -15 }}
+                            animate={{ opacity: 1, scale: 1.5, rotate: -15 }}
+                            transition={{
+                              delay: 0.4,
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 20,
+                            }}
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                          >
+                            <span className="border-4 border-rose-500 text-rose-500 font-black text-3xl px-3 py-1.5 mix-blend-multiply dark:mix-blend-screen opacity-95 tracking-tighter uppercase leading-none">
+                              유죄
+                            </span>
+                          </motion.div>
+                        </div>
                       </div>
 
-                      {/* 소환사 이름 + 태그 + 차렷 + 점수 */}
+                      {/* 닉네임 + 캐릭터 + 점수 */}
                       <div className="flex flex-col gap-2 min-w-0">
                         <div className="flex items-baseline gap-2 flex-wrap">
                           <span className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                            "{player.summonerName}
-                          </span>
-                          <span className="text-base text-slate-400 font-medium">
-                            #{player.summonerTag}
+                            "{player.accountName}"
                           </span>
                           <span className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                            " 차렷.
+                            차렷.
                           </span>
+                          <img
+                            src="https://pub-ec9311e4416d473a9cdd54c206eb2fef.r2.dev/Emoticon/NiaH%20Madge.png"
+                            className="w-15 h-15"
+                          />
                         </div>
                         <span className="text-base text-slate-900 dark:text-slate-100 font-medium">
-                          {player.champion}
+                          {player.korCharacter}
                         </span>
                         <span className="inline-block self-start px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-semibold">
                           범죄 점수 {player.score}점
@@ -128,14 +148,14 @@ export function VerdictModal({
                       </div>
                     </div>
 
-                    {/* 한줄평 (description) */}
+                    {/* 한줄평 */}
                     <div>
                       <p className="text-base text-slate-700 dark:text-slate-200 leading-relaxed">
                         "{player.description}"
                       </p>
                     </div>
 
-                    {/* reason */}
+                    {/* 판결 이유 */}
                     <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-5 py-4">
                       <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
                         {player.reason}

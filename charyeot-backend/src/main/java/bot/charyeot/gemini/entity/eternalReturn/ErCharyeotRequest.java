@@ -1,24 +1,20 @@
-package bot.charyeot.eternalReturn.entity;
+package bot.charyeot.gemini.entity.eternalReturn;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import bot.charyeot.eternalReturn.entity.ItemDetail;
+import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
-public class BattleUserResult {
+@AllArgsConstructor
+public class ErCharyeotRequest {
     private String nickname;
-    private int accountLevel;
-    private int gameId;
-    private int matchingMode;
-    private int seasonId;
-    private int characterNum;
-    private int skinCode;
+    private String matchingMode;
+    private String korCharacterName;
+    private String engCharacterName;
     private int characterLevel;
     private int gameRank;
     private int teamKill;
@@ -26,21 +22,16 @@ public class BattleUserResult {
     private int playerAssistant;
     private int playerDeaths;
     private int monsterKill;
-    private Map<Integer, Integer> equipment;
-    private Map<Integer, Integer> equipmentGrade;
-    private int duration;
     private int damageToPlayer;
     private int damageFromPlayer;
     private int damageToMonster;
     private int teamRecover;
     private int totalGainVFCredit;
     private int totalUseVFCredit;
-    private int tacticalSkillGroup;
+    private String tacticalSkillName;
     private int tacticalSkillLevel;
-    private int bestWeapon;
-    private int traitFirstCore;
-    private List<Integer> traitSecondSub;
-    private String startDtm;
+    private String mainTrait;
+    private Map<Integer, ItemDetail> itemList;
     private int transferConsoleFromRevivalUseVFCredit;
     private int creditRevivalCount;
     private int creditRevivedOthersCount;

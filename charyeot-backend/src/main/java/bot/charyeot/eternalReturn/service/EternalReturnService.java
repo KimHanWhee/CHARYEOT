@@ -116,7 +116,6 @@ public class EternalReturnService {
             JsonElement responseJson = JsonParser.parseString(response).getAsJsonObject().getAsJsonArray("userGames");
             Type listType = new TypeToken<List<BattleUserResult>>(){}.getType();
             List<BattleUserResult> battleUserResultList = gson.fromJson(responseJson, listType);
-            List<BattleUserResponse> responseList = new ArrayList<>();
 
             return battleUserResultList.stream()
                     .map(this::parseBattleUserResponse)

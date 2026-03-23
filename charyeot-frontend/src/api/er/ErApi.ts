@@ -1,5 +1,6 @@
 import type {
   BattleUserResponse,
+  ErCharyeotResponse,
   UserSearchData,
   UserStats,
 } from "../../types/er";
@@ -63,6 +64,22 @@ export async function fetchErBattleDetail(
 ): Promise<BattleUserResponse[]> {
   const res = await apiClient.get<BattleUserResponse[]>(
     ER_BATTLE_DETAIL_ENDPOINT(gameId),
+  );
+  return res.data;
+}
+
+/**
+ * 이터널리턴 판결 요청
+ * POST /v1/charyeot/er
+ * @param teamPlayers 내가 포함된 팀 BattleUserResponse 목록
+ */
+export async function fetchErCharyeot(
+  teamPlayers: BattleUserResponse[],
+): Promise<ErCharyeotResponse> {
+  const res = await apiClient.post<ErCharyeotResponse>(
+    "/v1/charyeot/er",
+    teamPlayers,
+    { timeout: 60_000 },
   );
   return res.data;
 }

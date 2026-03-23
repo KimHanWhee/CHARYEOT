@@ -23,7 +23,9 @@ const DEFAULT_STYLE = {
 
 export function MatchCard({ game, myNickname }: MatchCardProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [detailPlayers, setDetailPlayers] = useState<BattleUserResponse[] | null>(null);
+  const [detailPlayers, setDetailPlayers] = useState<
+    BattleUserResponse[] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleToggle = async () => {
@@ -243,8 +245,8 @@ export function MatchCard({ game, myNickname }: MatchCardProps): JSX.Element {
       </div>
 
       {/* 펼쳐진 상세 영역 */}
-      {isExpanded && (
-        isLoading ? (
+      {isExpanded &&
+        (isLoading ? (
           <div className="mt-3 border-t border-slate-200 dark:border-slate-700 pt-3 text-center text-sm text-slate-400 dark:text-slate-500">
             불러오는 중...
           </div>
@@ -254,8 +256,7 @@ export function MatchCard({ game, myNickname }: MatchCardProps): JSX.Element {
           <div className="mt-3 border-t border-slate-200 dark:border-slate-700 pt-3 text-center text-sm text-red-400">
             데이터를 불러오지 못했습니다.
           </div>
-        )
-      )}
+        ))}
     </div>
   );
 }

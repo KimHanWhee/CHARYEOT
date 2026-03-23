@@ -2,12 +2,12 @@ import { cn } from "../../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { Sword, Eye, Coins, ChevronDown, Gavel } from "lucide-react";
 import { JSX, useState } from "react";
-import { LolCharyeotResponse, Match } from "../../types/lol";
 import { ParticipantRow, TeamHeader } from "./ParticipantRow";
 import { getTimeAgo } from "../../lib/utils";
 import { VerdictModal } from "./VerdictModal";
 import { fetchLolCharyeot } from "../../api/lol/LolApi";
 import { RUNE_MAP, SPELL_MAP } from "@/src/lib/lolUtils";
+import { LolCharyeotResponse, Match } from "@/src/types/Lol";
 
 interface MatchCardProps {
   match: Match;
@@ -56,8 +56,12 @@ export function MatchCard({
   const redTeam = match.participantsDTO.filter((p) => p.teamId === 200);
   const isBlueWin = blueTeam[0]?.win;
 
-  const maxDealt = Math.max(...match.participantsDTO.map((p) => p.totalDamageDealtToChampions));
-  const maxTaken = Math.max(...match.participantsDTO.map((p) => p.totalDamageTaken));
+  const maxDealt = Math.max(
+    ...match.participantsDTO.map((p) => p.totalDamageDealtToChampions),
+  );
+  const maxTaken = Math.max(
+    ...match.participantsDTO.map((p) => p.totalDamageTaken),
+  );
 
   return (
     <div

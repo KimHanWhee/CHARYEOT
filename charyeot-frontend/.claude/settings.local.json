@@ -5,7 +5,9 @@
       "Bash(dir:*)",
       "Bash(npx tsc:*)",
       "Bash(npm install:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Read(//c/hanwheeWorkSpace/charyeot/charyeot-backend/src/main/java/bot/charyeot/gemini/entity/eternalReturn/**)",
+      "Read(//c/hanwheeWorkSpace/charyeot/charyeot-backend/src/main/java/bot/charyeot/gemini/controller/**)"
     ]
   }
 }

@@ -1,6 +1,10 @@
 package bot.charyeot.gemini.service;
 
+import bot.charyeot.eternalReturn.entity.BattleUserResult;
+import bot.charyeot.eternalReturn.entity.response.BattleUserResponse;
 import bot.charyeot.gemini.entity.GameType;
+import bot.charyeot.gemini.entity.eternalReturn.ErCharyeotRequest;
+import bot.charyeot.gemini.entity.eternalReturn.ErCharyeotResponse;
 import bot.charyeot.gemini.entity.leagueOfLegends.LolCharyeotRequest;
 import bot.charyeot.gemini.entity.leagueOfLegends.LolCharyeotResponse;
 import bot.charyeot.gemini.module.PromptLoader;
@@ -23,12 +27,14 @@ public class GeminiService {
 //    private final WebClient geminiWebClient;
 
     private final GenerateContentConfig lolConfig;
+    private final GenerateContentConfig erConfig;
     private final PromptLoader promptLoader;
     private final Client client;
     private final LolItemInfoFetcher lolItemInfoFetcher;
 
-    public GeminiService(@Qualifier("lolConfig") GenerateContentConfig lolConfig, PromptLoader promptLoader, Client client, LolItemInfoFetcher lolItemInfoFetcher) {
+    public GeminiService(@Qualifier("lolConfig") GenerateContentConfig lolConfig, @Qualifier("erConfig") GenerateContentConfig erConfig, PromptLoader promptLoader, Client client, LolItemInfoFetcher lolItemInfoFetcher) {
         this.lolConfig = lolConfig;
+        this.erConfig = erConfig;
 //        this.geminiWebClient = geminiWebClient;
         this.promptLoader = promptLoader;
         this.client = client;
@@ -40,7 +46,7 @@ public class GeminiService {
         GenerateContentConfig selectedConfig = switch (game) {
             case LEAGUE_OF_LEGENDS -> lolConfig;
             case VALORANT -> lolConfig;
-            case ETERNAL_RETURN -> lolConfig;
+            case ETERNAL_RETURN -> erConfig;
         };
 
         GenerateContentResponse response = client.models.generateContent(
@@ -71,6 +77,14 @@ public class GeminiService {
         return gson.fromJson(aiResponseJson, LolCharyeotResponse.class);
     }
 
+    public ErCharyeotResponse getErJudgement(List<BattleUserResponse> results) {
+        List<ErCharyeotRequest> request = generateErRequest(results);
+        Gson gson = new Gson();
+        String matchData = gson.toJson(request);
+        String aiResponseJson = getJudgment(GameType.ETERNAL_RETURN, matchData);
+        return gson.fromJson(aiResponseJson, ErCharyeotResponse.class);
+    }
+
     private List<LolCharyeotRequest> generateLolRequest(List<ParticipantsDTO> participantsList) {
         return participantsList.stream()
                 .filter(p -> !p.isWin())
@@ -93,6 +107,38 @@ public class GeminiService {
                         .item4(lolItemInfoFetcher.getItemName(p.getItem4()))
                         .item5(lolItemInfoFetcher.getItemName(p.getItem5()))
                         .item6(lolItemInfoFetcher.getItemName(p.getItem6()))
+                        .build())
+                .toList();
+    }
+
+    private List<ErCharyeotRequest> generateErRequest(List<BattleUserResponse> results) {
+        return results.stream()
+                .map(b -> ErCharyeotRequest.builder()
+                        .nickname(b.getNickname())
+                        .engCharacterName(b.getEngCharacterName())
+                        .korCharacterName(b.getKorCharacterName())
+                        .characterLevel(b.getCharacterLevel())
+                        .gameRank(b.getGameRank())
+                        .teamKill(b.getTeamKill())
+                        .playerKill(b.getPlayerKill())
+                        .playerDeaths(b.getPlayerDeaths())
+                        .playerAssistant(b.getPlayerAssistant())
+                        .monsterKill(b.getMonsterKill())
+                        .damageToPlayer(b.getDamageToPlayer())
+                        .damageFromPlayer(b.getDamageFromPlayer())
+                        .damageToMonster(b.getDamageToMonster())
+                        .teamRecover(b.getTeamRecover())
+                        .mainTrait(b.getMainTrait())
+                        .matchingMode(b.getMatchingMode())
+                        .itemList(b.getItemList())
+                        .tacticalSkillLevel(b.getTacticalSkillLevel())
+                        .totalGainVFCredit(b.getTotalGainVFCredit())
+                        .totalUseVFCredit(b.getTotalUseVFCredit())
+                        .korCharacterName(b.getKorCharacterName())
+                        .creditRevivedOthersCount(b.getCreditRevivedOthersCount())
+                        .tacticalSkillName(b.getTacticalSkillName())
+                        .creditRevivalCount(b.getCreditRevivalCount())
+                        .transferConsoleFromRevivalUseVFCredit(b.getTransferConsoleFromRevivalUseVFCredit())
                         .build())
                 .toList();
     }

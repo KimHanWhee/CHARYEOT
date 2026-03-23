@@ -1,6 +1,11 @@
 package bot.charyeot.gemini.controller;
 
+import bot.charyeot.eternalReturn.entity.BattleUserResult;
+import bot.charyeot.eternalReturn.entity.response.BattleUserResponse;
+import bot.charyeot.eternalReturn.service.EternalReturnService;
 import bot.charyeot.gemini.entity.GameType;
+import bot.charyeot.gemini.entity.eternalReturn.ErCharyeotRequest;
+import bot.charyeot.gemini.entity.eternalReturn.ErCharyeotResponse;
 import bot.charyeot.gemini.entity.leagueOfLegends.LolCharyeotResponse;
 import bot.charyeot.gemini.service.GeminiService;
 import bot.charyeot.leagueOfLegends.entity.MatchDTO;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -21,6 +27,7 @@ import java.util.Map;
 public class GeminiController {
     private final GeminiService geminiService;
     private final LolService lolService;
+    private final EternalReturnService eternalReturnService;
 
     @PostMapping("/v1/gemini")
     private ResponseEntity<String> getJudgement(@RequestBody Map<String, String> request) {
@@ -41,6 +48,17 @@ public class GeminiController {
             MatchDTO matchDTO = lolService.getMatchByMatchId(matchId);
 
             return ResponseEntity.ok(geminiService.getLolJudgement(matchDTO));
+        } catch (Exception e) {
+            log.error("리그오브레전드 판결 도중 에러 발생 : ", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/v1/charyeot/er")
+    private ResponseEntity<ErCharyeotResponse> getErJudgement(@RequestBody List<BattleUserResponse> results) {
+        try {
+            log.info("이터널리턴 판결 시작...");
+            return ResponseEntity.ok(geminiService.getErJudgement(results));
         } catch (Exception e) {
             log.error("리그오브레전드 판결 도중 에러 발생 : ", e);
             return ResponseEntity.internalServerError().build();

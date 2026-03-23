@@ -1,12 +1,21 @@
-import { ApiResponse } from '../types/api';
-import type { DataDragon, LolCharyeotResponse, Match, PlayerSearchResult, Profile } from '../types/lol';
-import { apiClient } from './Client';
+import { ApiResponse } from "../types/Api";
+import type {
+  DataDragon,
+  LolCharyeotResponse,
+  Match,
+  PlayerSearchResult,
+  Profile,
+} from "../types/Lol";
+import { apiClient } from "./Client";
 
 /**
  * 플레이어 프로필 조회
  * GET /v1/lol/summoner/{name}/{tag}
  */
-export async function fetchPlayerProfile(name: string, tag: string): Promise<Profile> {
+export async function fetchPlayerProfile(
+  name: string,
+  tag: string,
+): Promise<Profile> {
   const res = await apiClient.get<Profile>(
     `/v1/lol/summoner/profile/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`,
   );
@@ -38,25 +47,29 @@ export async function fetchPlayerSummary(
   return res.data.data;
 }
 
-
 /**
  * 특정 경기에 대한 Gemini 판결 요청
  * POST /v1/charyeot/lol/{matchId}
  */
-export async function fetchLolCharyeot(matchId: string): Promise<LolCharyeotResponse> {
-  const res = await apiClient.post<LolCharyeotResponse>(`/v1/charyeot/lol/${encodeURIComponent(matchId)}`, null, {
-    timeout: 60_000, // Gemini 응답 대기 최대 60초
-  });
+export async function fetchLolCharyeot(
+  matchId: string,
+): Promise<LolCharyeotResponse> {
+  const res = await apiClient.post<LolCharyeotResponse>(
+    `/v1/charyeot/lol/${encodeURIComponent(matchId)}`,
+    null,
+    {
+      timeout: 60_000, // Gemini 응답 대기 최대 60초
+    },
+  );
   return res.data;
 }
 
 /**
  * Riot Games에서 제공하는 이미지 데이터 보관소인 DataDragon의 버전정보를 불러오는 API
  */
-export async function fetchDataDragonVersion() : Promise<string> {
+export async function fetchDataDragonVersion(): Promise<string> {
   const res = await apiClient.get<DataDragon>(
-    'https://ddragon.leagueoflegends.com/realms/kr.json',
+    "https://ddragon.leagueoflegends.com/realms/kr.json",
   );
   return res.data.v;
-  
 }

@@ -23,7 +23,10 @@ public class PromptLoader {
     public void init() {
         log.info("리그오브레전드 프롬프트 로딩 시작...");
         this.leagueOfLegendsPrompt = load("leagueOfLegends");
-        log.info("프롬프트 로딩 성공");
+        log.info("리그오브레전드 프롬프트 로딩 성공");
+        log.info("이터널리턴 프롬프트 로딩 시작...");
+        this.eternalReturnPrompt = load("eternalReturn");
+        log.info("이터널리턴 프롬프트 로딩 성공");
     }
 
     public String load(String gameName) {

@@ -1,5 +1,8 @@
-import { JSX } from "react";
-import { BattleUserResponse } from "../../types/er";
+import { JSX, useState } from "react";
+import { BattleUserResponse, ErCharyeotResponse } from "../../types/er";
+import { Gavel } from "lucide-react";
+import { fetchErCharyeot } from "../../api/er/ErApi";
+import { ErVerdictModal } from "./ErVerdictModal";
 
 interface MatchCardDetailProps {
   players: BattleUserResponse[];
@@ -326,6 +329,45 @@ export function MatchCardDetail({
   players,
   myNickname,
 }: MatchCardDetailProps): JSX.Element {
+  const [verdictOpen, setVerdictOpen] = useState(false);
+  const [verdictLoading, setVerdictLoading] = useState(false);
+  const [verdict, setVerdict] = useState<ErCharyeotResponse | null>(null);
+  const [specialMessage, setSpecialMessage] = useState<string | null>(null);
+
+  const handleVerdictClick = async () => {
+    const me = players.find((p) => p.nickname === myNickname);
+    if (!me) return;
+
+    // 론울프 모드 (matchingMode === 9)
+    if (me.matchingMode === 9) {
+      setSpecialMessage("론울프는 니 잘못이다..");
+      setVerdictOpen(true);
+      return;
+    }
+
+    // 1등
+    if (me.gameRank === 1) {
+      setSpecialMessage("1등인데 뭘 범인을 찾냐 그냥 즐겨잇~");
+      setVerdictOpen(true);
+      return;
+    }
+
+    const myTeam = players.filter((p) => p.gameRank === me.gameRank);
+    setVerdict(null);
+    setSpecialMessage(null);
+    setVerdictOpen(true);
+    setVerdictLoading(true);
+    try {
+      const result = await fetchErCharyeot(myTeam);
+      setVerdict(result);
+    } catch (e: any) {
+      console.error("[ErCharyeot] 요청 실패:", e?.response?.status, e?.response?.data, e?.message);
+      setSpecialMessage(`판결 요청 실패: ${e?.response?.status ?? e?.message ?? "알 수 없는 오류"}`);
+    } finally {
+      setVerdictLoading(false);
+    }
+  };
+
   const damageMaxes: DamageMaxes = {
     damageToPlayer: Math.max(...players.map((p) => p.damageToPlayer)),
     damageFromPlayer: Math.max(...players.map((p) => p.damageFromPlayer)),
@@ -349,6 +391,19 @@ export function MatchCardDetail({
 
   return (
     <div className="mt-3 border-t border-slate-200 dark:border-slate-700 pt-3 flex flex-col gap-1.5">
+      {/* 상단 우측: 판결 버튼 */}
+      <div className="flex justify-end">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleVerdictClick();
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500 hover:cursor-pointer hover:bg-rose-600 text-white text-xs font-semibold transition-colors shadow-sm"
+        >
+          <Gavel size={13} />
+          차렷봇 판결하기
+        </button>
+      </div>
       <TableHeader />
       {sortedGroups.map((teamPlayers, groupIdx) => {
         const rank = teamPlayers[0].gameRank;
@@ -374,6 +429,17 @@ export function MatchCardDetail({
           </div>
         );
       })}
+
+      <ErVerdictModal
+        isOpen={verdictOpen}
+        isLoading={verdictLoading}
+        verdict={verdict}
+        specialMessage={specialMessage}
+        onClose={() => {
+          setVerdictOpen(false);
+          setSpecialMessage(null);
+        }}
+      />
     </div>
   );
 }
