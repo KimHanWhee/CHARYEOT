@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(cat /c/hanwheeWorkSpace/charyeot/charyeot-frontend/src/pages/er/*.tsx)",
+      "Bash(git -C /c/hanwheeWorkSpace/charyeot log --oneline)"
     ]
   }
 }
