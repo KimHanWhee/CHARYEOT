@@ -34,7 +34,7 @@ public class EternalReturnService {
             log.info("유저 아이디 조회 : {}", userInfo);
             Season currentSeason = getCurrentSeason();
             log.info("유저 스탯 조회 시작... season: {}, userId : {}, userName: {}", currentSeason.getSeasonID(), userInfo.getUserId(), userInfo.getNickname());
-            List<UserStats> userStats = getUserStats(userInfo.getUserId(), 0, 0);
+            List<UserStats> userStats = getUserStats(userInfo.getUserId(), currentSeason.getSeasonID(), 3);
             log.info("유저 전적 조회 시작... userId : {}, userName: {}", userInfo.getUserId(), userInfo.getNickname());
             List<BattleUserResponse> battleUserResponses = getBattleUserResultList(userInfo.getUserId());
             return new UserSearchData(userInfo, userStats, battleUserResponses);
@@ -85,6 +85,21 @@ public class EternalReturnService {
 
         } catch (Exception e) {
             log.error("[Eternal Return] Error occurred while get user stats : ", e);
+            throw new Exception(e);
+        }
+    }
+
+    private UserRank getUserRank(String uid, int seasonId) throws Exception {
+        try {
+            String response = nimbleWebClient.get()
+                    .uri("/v1/rank/uid/{userId}/{seasonId}/3", uid, seasonId)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            JsonElement responseJson = JsonParser.parseString(response).getAsJsonObject().get("userRank");
+            return gson.fromJson(responseJson, UserRank.class);
+        } catch (Exception e) {
+            log.error("[Eternal Return] Error occurred while get user Rank : ", e);
             throw new Exception(e);
         }
     }

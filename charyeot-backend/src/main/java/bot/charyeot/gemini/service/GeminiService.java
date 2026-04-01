@@ -32,6 +32,7 @@ public class GeminiService {
     private final Client client;
     private final LolItemInfoFetcher lolItemInfoFetcher;
 
+
     public GeminiService(@Qualifier("lolConfig") GenerateContentConfig lolConfig, @Qualifier("erConfig") GenerateContentConfig erConfig, PromptLoader promptLoader, Client client, LolItemInfoFetcher lolItemInfoFetcher) {
         this.lolConfig = lolConfig;
         this.erConfig = erConfig;
