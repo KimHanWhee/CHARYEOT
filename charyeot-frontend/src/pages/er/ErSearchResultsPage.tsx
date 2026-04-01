@@ -5,6 +5,7 @@ import { fetchErUserSearchData } from "../../api/er/ErApi";
 import { UserStats, UserInfo, BattleUserResponse } from "../../types/er";
 import { PlayerProfile } from "@/src/components/er/PlayerProfile";
 import { MatchCard } from "../../components/er/MatchCard";
+import { ErRankTierCard } from "../../components/er/ErRankTierCard";
 
 export function ErSearchResultsPage() {
   const { summonerName: nickname } = useParams<{ summonerName: string }>();
@@ -81,18 +82,27 @@ export function ErSearchResultsPage() {
         />
       )}
 
-      {/* 전적 목록 */}
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">최근 전적</p>
-        <span className="text-slate-500 text-sm">
-          {games.length} 게임 검색 됨
-        </span>
-      </div>
+      <div className="flex flex-col xl:flex-row gap-4 items-start">
+        {/* 좌측: 랭크 티어 (xl 이상에서 sticky 사이드바) */}
+        <div className="w-full xl:w-48 xl:flex-shrink-0 xl:sticky xl:top-4">
+          <ErRankTierCard stats={stats} />
+        </div>
 
-      <div className="grid gap-4">
-        {games.map((game) => (
-          <MatchCard game={game} myNickname={nickname ?? ""} />
-        ))}
+        {/* 우측: 전적 목록 */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-slate-500 text-sm">최근 전적</p>
+            <span className="text-slate-500 text-sm">
+              {games.length} 게임 검색 됨
+            </span>
+          </div>
+
+          <div className="grid gap-4">
+            {games.map((game) => (
+              <MatchCard game={game} myNickname={nickname ?? ""} />
+            ))}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
